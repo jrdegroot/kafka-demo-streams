@@ -1,0 +1,40 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: streams-application
+
+  kafka:
+    bootstrap-servers: http://localhost:29092,http://localhost:29093,http://localhost:29094
+    security:
+      protocol: PLAINTEXT
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+    streams:
+      application-id: ${spring.application.name}
+      bootstrap-servers: ${spring.kafka.bootstrap-servers}
+      # This setting is here to don't wait until the buffer is full
+      cache-max-size-buffering: 0
+      properties:
+        schema.registry.url: http://localhost:8081
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
+        default.deserialization.exception.handler: org.apache.kafka.streams.errors.LogAndFailExceptionHandler
+        spring.json.trusted.packages: "*"
+        spring.json.type.mapping: "User:com.example.kafkademostreams.model.User"
+
+
+# Open up all Spring Boot Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
